@@ -109,6 +109,7 @@ drawSkiMap = function(divName, jsonDir) {
                 northEast = L.latLng(data.bbox[3], data.bbox[2]);
 
                 var bounds = L.latLngBounds(southWest, northEast);
+                console.log('bounds:', bounds);
                 map.fitBounds(bounds);
 
                 var feature = gAreaBoundaries.selectAll(".boundary-path")
