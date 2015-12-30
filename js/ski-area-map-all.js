@@ -75,7 +75,7 @@ drawSkiMap = function(divName, jsonDir) {
     var mapQuestLayer = new L.TileLayer.MapQuestOpen.OSM();
     mapQuestLayer.addTo(map);
 
-    var baseMaps = { 'MapQuestOpen': mapQuestLayer,
+    var baseMaps = { 'MapQuest Open': mapQuestLayer,
                     'Mapnik': mapnikLayer };
 
     L.control.layers(baseMaps).addTo(map);

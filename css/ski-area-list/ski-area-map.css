@@ -1,5 +1,18 @@
+#continents-table {
+    width: 100%;
+}
+
+td.continent-cell {
+    width: 16%;
+    text-align: center;
+}
+
+#resort-stuff {
+    position: relative;
+}
+
 #map-area {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
 }
