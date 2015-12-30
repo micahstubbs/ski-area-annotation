@@ -68,11 +68,9 @@ drawSkiMap = function(divName, jsonDir) {
         zoom: 5
     });
 
-    /*
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    var mapnikLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    */
+    });
 
     L.TileLayer.Common = L.TileLayer.extend({
         initialize: function (options) {
@@ -94,9 +92,13 @@ drawSkiMap = function(divName, jsonDir) {
         }
     });
 
-    var osmLayer = new L.TileLayer.MapQuestOpen.OSM();
-    osmLayer.addTo(map);
+    var mapQuestLayer = new L.TileLayer.MapQuestOpen.OSM();
+    mapQuestLayer.addTo(map);
 
+    var baseMaps = { 'MapQuestOpen': mapQuestLayer,
+                    'Mapnik': mapnikLayer };
+
+    L.control.layers(baseMaps).addTo(map);
 
     var topPane = map._createPane('leaflet-top-pane', map.getPanes().mapPane);
     //var topLayerLines = new L.StamenTileLayer('toner-lines', {'opacity': 0.8});
