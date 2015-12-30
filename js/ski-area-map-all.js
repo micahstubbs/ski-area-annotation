@@ -72,26 +72,6 @@ drawSkiMap = function(divName, jsonDir) {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     });
 
-    L.TileLayer.Common = L.TileLayer.extend({
-        initialize: function (options) {
-            L.TileLayer.prototype.initialize.call(this, this.url, options);
-        }
-    });
-
-
-    var mqTilesAttr = 'Tiles &copy; <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png" />';
-
-    L.TileLayer.MapQuestOpen = {};
-
-    L.TileLayer.MapQuestOpen.OSM = L.TileLayer.Common.extend({
-        url: 'http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.png',
-        options: {
-            subdomains: '1234',
-            type: 'osm',
-            attribution: 'Map data ' + L.TileLayer.OSM_ATTR + ', ' + mqTilesAttr
-        }
-    });
-
     var mapQuestLayer = new L.TileLayer.MapQuestOpen.OSM();
     mapQuestLayer.addTo(map);
 
