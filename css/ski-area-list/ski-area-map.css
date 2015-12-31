@@ -20,13 +20,21 @@ td.continent-cell {
 .boundary-path {
     stroke: black;
     stroke-width: 1;
-    fill: grey;
+    fill: red;
     opacity: 0.5;
 }
 
 text {
     visibility: hidden;
     pointer-events: none;
+}
+
+path.annotated {
+    fill: green;
+}
+
+path.selected {
+    fill: yellow;
 }
 
 text.selected {

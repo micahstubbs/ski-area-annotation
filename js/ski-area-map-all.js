@@ -123,11 +123,12 @@ drawSkiMap = function(divName, jsonDir) {
                 .data(topojson.feature(data, data.objects.boundaries).features)
                 .enter().append("path")
                 .classed('boundary-path', true)
-                .style('fill', function(d) { 
+                .attr('id', function(d) { return 'b' + d.properties.uid; })
+                .classed('annotated', function(d) {
                     if (d.properties.uid in uids_to_names)
-                        return 'green';
+                        return true;
                     else
-                        return 'red';
+                        return false;
                 })
                 .on('mouseover', function(d) {
                     d3.selectAll('#u' + d.properties.uid)
@@ -147,6 +148,12 @@ drawSkiMap = function(divName, jsonDir) {
                     .classed('selected', true)
                     .node()
                     .scrollIntoView();
+
+                    d3.selectAll('.boundary-path')
+                    .classed('selected', false);
+
+                    d3.select(this)
+                    .classed('selected', true);
                 });
 
                 var namedFeatures = topojson.feature(data, data.objects.boundaries).features;
@@ -209,6 +216,11 @@ drawSkiMap = function(divName, jsonDir) {
                     var newBounds = geoBounds(d);
                     d3.selectAll('a')
                     .classed('selected', false);
+
+                    feature.classed('selected', false);
+
+                    d3.select('#b' + d.properties.uid)
+                    .classed('selected', true);
 
                     d3.select(this).classed('selected', true);
                     map.fitBounds(newBounds);
