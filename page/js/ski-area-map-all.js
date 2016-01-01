@@ -203,13 +203,21 @@ drawSkiMap = function(divName, jsonDir) {
 
                 var lis = d3.select("#resort-list")
                 .append('ul')
-                .selectAll('li')
+                .classed('area-list', true)
+                .append('table')
+                .attr('id', 'resort-list-table')
+                .selectAll('tr')
                 .data(skiAreas)
                 .enter()
-                .append('li');
+                .append('tr');
+
+                lis.append('td')
+                .classed('area', true)
+                .text(function(d,i) { return i;});
 
                 var roundFormat = d3.format('.3f');
-                lis.append('a')
+                lis.append('td').append('a')
+                .classed('area', true)
                 .attr('href', "javascript:void(0);")
                 .attr('id', function(d) { return 'a-' + d.properties.uid; })
                 .on('click', function(d) { 
@@ -225,9 +233,11 @@ drawSkiMap = function(divName, jsonDir) {
                     d3.select(this).classed('selected', true);
                     map.fitBounds(newBounds);
                 })
-                .text(function(d,i) { return i + ") " + roundFormat(d.properties.area) + " || " ; });
+                .text(function(d,i) { return roundFormat(d.properties.area); });
 
-                lis.append('input')
+
+                lis.append('td')
+                .append('input')
                 .attr('type', 'text')
                 .attr('name', function(d) { return 'i' + d.properties.uid; })
                 .attr('value', function(d) { 
