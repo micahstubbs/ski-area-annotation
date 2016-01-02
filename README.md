@@ -4,6 +4,7 @@
 
 Run a local web server:
 
+    cd page
     python -m SimpleHTTPServer 8008
 
 Go to a continent (i.e. Europe). Click on one of the numbers on the right. Each
