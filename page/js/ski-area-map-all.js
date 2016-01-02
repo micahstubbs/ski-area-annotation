@@ -21,7 +21,6 @@ function geoBounds(feature) {
                 maxLon = coords[j][0];
         }
     }
-    console.log('minLat:', minLat, 'minLon:', minLon);
     var newBounds = L.latLngBounds(
         L.latLng(minLat, minLon),
         L.latLng(maxLat, maxLon));
@@ -109,27 +108,26 @@ drawSkiMap = function(divName, jsonDir) {
         path = d3.geo.path().projection(transform);
 
     d3.json(jsonDir + '/uids-to-names.json', function(error, uids_to_names) {
-        console.log('uids_to_names', uids_to_names);
         d3.json(jsonDir + '/ski-areas.topo', function(error, data) {
-            console.log('data.bbox:', data.bbox);
             var southWest = L.latLng(data.bbox[1], data.bbox[0]),
                 northEast = L.latLng(data.bbox[3], data.bbox[2]);
 
                 var bounds = L.latLngBounds(southWest, northEast);
-                console.log('bounds:', bounds);
                 map.fitBounds(bounds);
+
+                function isAnnotated(d) {
+                    if (d.properties.uid in uids_to_names)
+                        return true;
+                    else
+                        return false;
+                }
 
                 var feature = gAreaBoundaries.selectAll(".boundary-path")
                 .data(topojson.feature(data, data.objects.boundaries).features)
                 .enter().append("path")
                 .classed('boundary-path', true)
                 .attr('id', function(d) { return 'b' + d.properties.uid; })
-                .classed('annotated', function(d) {
-                    if (d.properties.uid in uids_to_names)
-                        return true;
-                    else
-                        return false;
-                })
+                .classed('annotated', isAnnotated)
                 .on('mouseover', function(d) {
                     d3.selectAll('#u' + d.properties.uid)
                     .classed('selected', true)
@@ -139,7 +137,6 @@ drawSkiMap = function(divName, jsonDir) {
                     .classed('selected', false)
                 })
                 .on('click', function(d) {
-                    console.log('clicked');
                     d3.selectAll('a')
                     .classed('selected', false);
 
@@ -156,11 +153,25 @@ drawSkiMap = function(divName, jsonDir) {
                     .classed('selected', true);
                 });
 
+                var areaCircles = gAreaBoundaries.selectAll('.area-circle')
+                .data(topojson.feature(data, data.objects.boundaries).features)
+                .enter().append('g')
+                .attr('transform', function(d) {
+                    var centroid = path.centroid(d.geometry);
+                    return 'translate(' + centroid[0] + ',' + centroid[1] + ')';
+                });
+
+                areaCircles.append('circle')
+                .classed('area-circle', true)
+                .classed('annotated', isAnnotated)
+                .attr('r', function(d) {
+                    return Math.sqrt(1 + d.properties.area);
+                });
+
                 var namedFeatures = topojson.feature(data, data.objects.boundaries).features;
                 namedFeatures = namedFeatures.filter(function(d) {
                     return d.properties.uid in uids_to_names;
                 });
-                console.log('namedFeatures:', namedFeatures);
 
                 var text = gAreaBoundaries.selectAll('.boundary-text')
                 .data(namedFeatures)
@@ -182,15 +193,31 @@ drawSkiMap = function(divName, jsonDir) {
                 .attr('dominant-baseline', 'central');
 
                 function resetView() {
-                    feature.attr("d", function(d) { return path(d.geometry); });
-                    text.attr('transform', function(d) {
-                        var centroid = path.centroid(d.geometry);
-                        return 'translate(' + centroid[0] + ',' + centroid[1] + ')';
-                    });
-                    text1.attr('transform', function(d) {
-                        var centroid = path.centroid(d.geometry);
-                        return 'translate(' + centroid[0] + ',' + centroid[1] + ')';
-                    });
+                    console.log('zoom:', map.getZoom());
+
+                    if (map.getZoom() > 7) {
+                        feature.attr("d", function(d) { return path(d.geometry); })
+                        .style('visibility', 'visible');
+                        areaCircles.style('visibility', 'hidden');
+
+                        text.attr('transform', function(d) {
+                            var centroid = path.centroid(d.geometry);
+                            return 'translate(' + centroid[0] + ',' + centroid[1] + ')';
+                        });
+                        text1.attr('transform', function(d) {
+                            var centroid = path.centroid(d.geometry);
+                            return 'translate(' + centroid[0] + ',' + centroid[1] + ')';
+                        });
+
+                    } else {
+                        areaCircles.style('visibility', 'visible');
+                        feature.style('visibility', 'hidden');
+
+                        areaCircles.attr('transform', function(d) {
+                            var centroid = path.centroid(d.geometry);
+                            return 'translate(' + centroid[0] + ',' + centroid[1] + ')';
+                        });
+                    }
                 }
 
                 map.on("viewreset", resetView);
@@ -198,8 +225,6 @@ drawSkiMap = function(divName, jsonDir) {
 
                 var skiAreas = topojson.feature(data, data.objects.boundaries).features;
                 skiAreas.sort(function(a,b) { return +b.properties.area - a.properties.area; });
-
-                console.log('bounds:', bounds);
 
                 var lis = d3.select("#resort-list")
                 .append('ul')
@@ -255,7 +280,6 @@ drawSkiMap = function(divName, jsonDir) {
                     var blob = new Blob([data_string], {type: "application/json"});
                     saveAs(blob, 'uids-to-names.json');
 
-                    console.log('uids_to_names:', uids_to_names);
                 });
 
         });
